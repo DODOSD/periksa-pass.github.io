@@ -115,117 +115,114 @@
 
 <!-- JavaScript for password strength check -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  var passwordInput = document.getElementById('password');
-  
-  passwordInput.addEventListener('keyup', function(event) {
-      if (event.key === 'Enter') {
-          checkPasswordStrength();
-      }
-  });
-});
+    document.getElementById('password').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                checkPasswordStrength();
+            }
+        });
 
-function checkPasswordStrength() {
-  var password = document.getElementById('password').value;
-  var strengthMeter = document.getElementById('strength');
-  var strength = 0;
+        function checkPasswordStrength() {
+            var password = document.getElementById('password').value;
+            var strengthMeter = document.getElementById('strength');
+          
+            let hurufKecil = false;
+            let hurufBesar = false;
+            let angka = false;
+            let simbol = false;
 
-  // Check if password contains lowercase letters
-  if (/[a-z]/.test(password)) {
-      strength += 1;
-  }
-  // Check if password contains uppercase letters
-  if (/[A-Z]/.test(password)) {
-      strength += 1;
-  }
-  // Check if password contains numbers
-  if (/\d/.test(password)) {
-      strength += 1;
-  }
-  // Check if password contains symbols
-  if (/[^\w\s]/.test(password)) {
-      strength += 1;
-  }
+            for (let i = 0; i < password.length; ++i) {
+                if (password[i] >= 'a' && password[i] <= 'z') {
+                    hurufKecil = true;
+                } else if (password[i] >= 'A' && password[i] <= 'Z') {
+                    hurufBesar = true;
+                } else if (password[i] >= '0' && password[i] <= '9') {
+                    angka = true;
+                } else {
+                    simbol = true;
+                }
+            }
 
-  // Display strength level
-  if (strength == 0) {
-      strengthMeter.innerHTML = "<span class='very-weak'>Sangat Lemah</span>";
-  } else if (strength == 1) {
-      strengthMeter.innerHTML = "<span class='weak'>Lemah</span>";
-  } else if (strength == 2) {
-      strengthMeter.innerHTML = "<span class='moderate'>Sedang</span>";
-  } else if (strength == 3) {
-      strengthMeter.innerHTML = "<span class='strong'>Kuat</span>";
-  } else if (strength == 4) {
-      strengthMeter.innerHTML = "<span class='very-strong'>Sangat Kuat</span>";
-  }
+            let R = 0;
+            if (hurufKecil) R += 26;
+            if (hurufBesar) R += 26;
+            if (angka) R += 10;
+            if (simbol) R += 33;
 
-  // Estimate time to crack the password
-  var R = 0;
-  if (/[a-z]/.test(password)) R += 26;
-  if (/[A-Z]/.test(password)) R += 26;
-  if (/\d/.test(password)) R += 10;
-  if (/[^\w\s]/.test(password)) R += 33;
+            let kombinasi = Math.pow(R, password.length);
+            let E = Math.round(Math.log2(kombinasi));
 
-  var combinations = Math.pow(R, password.length);
-  var timeInSeconds = combinations / 10000000;
-  var timeUnit = 'detik';
+            // Display password strength
+            if (E >= 0 && E <= 35) {
+                strengthMeter.innerHTML = "<span class='very-weak'>Sangat Lemah!</span>";
+            } else if (E >= 36 && E <= 59) {
+                strengthMeter.innerHTML = "<span class='weak'>Lemah!</span>";
+            } else if (E >= 60 && E <= 119) {
+                strengthMeter.innerHTML = "<span class='strong'>Kuat!</span>";
+            } else if (E >= 120) {
+                strengthMeter.innerHTML = "<span class='very-strong'>Sangat Kuat!</span>";
+            } else {
+                strengthMeter.innerHTML = "<span class='error'>Error!</span>";
+            }
 
-  if (timeInSeconds < 1) {
-      strengthMeter.innerHTML += " - Kurang dari 1 detik untuk diretas";
-  } else if (timeInSeconds < 60) {
-      strengthMeter.innerHTML += " - " + timeInSeconds.toFixed(2) + " detik untuk diretas";
-  } else {
-      timeInSeconds /= 60;
-      timeUnit = 'menit';
-      if (timeInSeconds < 60) {
-          strengthMeter.innerHTML += " - " + timeInSeconds.toFixed(2) + " " + timeUnit + " untuk diretas";
-      } else {
-          timeInSeconds /= 60;
-          timeUnit = 'jam';
-          if (timeInSeconds < 24) {
-              strengthMeter.innerHTML += " - " + timeInSeconds.toFixed(2) + " " + timeUnit + " untuk diretas";
-          } else {
-              timeInSeconds /= 24;
-              timeUnit = 'hari';
-              if (timeInSeconds < 31) {
-                  strengthMeter.innerHTML += " - " + timeInSeconds.toFixed(2) + " " + timeUnit + " untuk diretas";
-              } else {
-                  timeInSeconds /= 31;
-                  timeUnit = 'bulan';
-                  if (timeInSeconds < 12) {
-                      strengthMeter.innerHTML += " - " + timeInSeconds.toFixed(2) + " " + timeUnit + " untuk diretas";
-                  } else {
-                      timeInSeconds /= 12;
-                      timeUnit = 'tahun';
-                      if (timeInSeconds < 1000) {
-                          strengthMeter.innerHTML += " - " + timeInSeconds.toFixed(2) + " " + timeUnit + " untuk diretas";
-                      } else {
-                          timeInSeconds /= 1000;
-                          timeUnit = 'ribuan tahun';
-                          if (timeInSeconds < 1000) {
-                              strengthMeter.innerHTML += " - " + timeInSeconds.toFixed(2) + " " + timeUnit + " untuk diretas";
-                          } else {
-                              timeInSeconds /= 1000;
-                              timeUnit = 'jutaan tahun';
-                              if (timeInSeconds < 1000) {
-                                  strengthMeter.innerHTML += " - " + timeInSeconds.toFixed(2) + " " + timeUnit + " untuk diretas";
-                              } else {
-                                  timeInSeconds /= 1000;
-                                  timeUnit = 'milliaran tahun';
-                                  if (timeInSeconds < 1000) {
-                                      strengthMeter.innerHTML += " - " + timeInSeconds.toFixed(2) + " " + timeUnit + " untuk diretas";
-                                  } else {
-                                      strengthMeter.innerHTML += " - Selamanya untuk diretas";
-                                  }
-                              }
-                          }
-                      }
-                  }
-              }
-          }
-      }
-  }
-}
+            // Estimate time to crack the password
+            let timeInSeconds = kombinasi / 10000000;
+            let timeUnit = 'detik';
+
+            if (timeInSeconds < 1) {
+                strengthMeter.innerHTML += " - Kurang dari 1 detik untuk diretas";
+            } else if (timeInSeconds < 60) {
+                strengthMeter.innerHTML += " - " + timeInSeconds.toFixed(2) + " detik untuk diretas";
+            } else {
+                timeInSeconds /= 60;
+                timeUnit = 'menit';
+                if (timeInSeconds < 60) {
+                    strengthMeter.innerHTML += " - " + timeInSeconds.toFixed(2) + " " + timeUnit + " untuk diretas";
+                } else {
+                    timeInSeconds /= 60;
+                    timeUnit = 'jam';
+                    if (timeInSeconds < 24) {
+                        strengthMeter.innerHTML += " - " + timeInSeconds.toFixed(2) + " " + timeUnit + " untuk diretas";
+                    } else {
+                        timeInSeconds /= 24;
+                        timeUnit = 'hari';
+                        if (timeInSeconds < 31) {
+                            strengthMeter.innerHTML += " - " + timeInSeconds.toFixed(2) + " " + timeUnit + " untuk diretas";
+                        } else {
+                            timeInSeconds /= 31;
+                            timeUnit = 'bulan';
+                            if (timeInSeconds < 12) {
+                                strengthMeter.innerHTML += " - " + timeInSeconds.toFixed(2) + " " + timeUnit + " untuk diretas";
+                            } else {
+                                timeInSeconds /= 12;
+                                timeUnit = 'tahun';
+                                if (timeInSeconds < 1000) {
+                                    strengthMeter.innerHTML += " - " + timeInSeconds.toFixed(2) + " " + timeUnit + " untuk diretas";
+                                } else {
+                                    timeInSeconds /= 1000;
+                                    timeUnit = 'ribuan tahun';
+                                    if (timeInSeconds < 1000) {
+                                        strengthMeter.innerHTML += " - " + timeInSeconds.toFixed(2) + " " + timeUnit + " untuk diretas";
+                                    } else {
+                                        timeInSeconds /= 1000;
+                                        timeUnit = 'jutaan tahun';
+                                        if (timeInSeconds < 1000) {
+                                            strengthMeter.innerHTML += " - " + timeInSeconds.toFixed(2) + " " + timeUnit + " untuk diretas";
+                                        } else {
+                                            timeInSeconds /= 1000;
+                                            timeUnit = 'milliaran tahun';
+                                            if (timeInSeconds < 1000) {
+                                                strengthMeter.innerHTML += " - " + timeInSeconds.toFixed(2) + " " + timeUnit + " untuk diretas";
+                                            } else {
+                                                strengthMeter.innerHTML += " - <span class='forever'>Selamanya untuk diretas</span>";
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 </script>
 </html>
